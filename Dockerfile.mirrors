@@ -25,6 +25,11 @@ COPY system/99fixbadproxy /etc/apt/apt.conf.d/99fixbadproxy
 
 WORKDIR /root
 
+# 使用国内镜像源
+RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main" >> /etc/apt/sources.list
+
 # Clear previous sources
 RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
     case "${dpkgArch##*-}" in \
@@ -40,8 +45,8 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
         echo "Acquire::http::Proxy \"$HTTP_PROXY\";" >> /etc/apt/apt.conf.d/01proxy; \
         echo "Acquire::https::Proxy \"$HTTPS_PROXY\";" >> /etc/apt/apt.conf.d/01proxy; \
         echo "Acquire::Retries 3;" >> /etc/apt/apt.conf.d/01proxy; \
-        echo "Acquire::http::Timeout 10;" >> /etc/apt/apt.conf.d/01proxy; \
-        echo "Acquire::https::Timeout 10;" >> /etc/apt/apt.conf.d/01proxy; \
+        echo "Acquire::http::Timeout 30;" >> /etc/apt/apt.conf.d/01proxy; \
+        echo "Acquire::https::Timeout 30;" >> /etc/apt/apt.conf.d/01proxy; \
     fi \
     # Base dependencies
     && apt-get -y update \
@@ -59,19 +64,20 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
         wget \
         gnupg \
         musl \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs \
     && mkdir -p /var/log/supervisor \
     && rm -rf .profile \
-    # Install InfluxDB
-    && wget --no-verbose https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_${ARCH}.deb \
+    # Install InfluxDB from 清华源
+    && wget --no-verbose https://mirrors.tuna.tsinghua.edu.cn/influxdata/influxdb/releases/influxdb_${INFLUXDB_VERSION}_${ARCH}.deb || \
+       wget --no-verbose https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_${ARCH}.deb \
     && dpkg -i influxdb_${INFLUXDB_VERSION}_${ARCH}.deb \
     && rm influxdb_${INFLUXDB_VERSION}_${ARCH}.deb \
     # Install Chronograf
-    && wget https://dl.influxdata.com/chronograf/releases/chronograf_${CHRONOGRAF_VERSION}_${ARCH}.deb \
+    && wget --no-verbose https://mirrors.tuna.tsinghua.edu.cn/influxdata/chronograf/releases/chronograf_${CHRONOGRAF_VERSION}_${ARCH}.deb || \
+       wget --no-verbose https://dl.influxdata.com/chronograf/releases/chronograf_${CHRONOGRAF_VERSION}_${ARCH}.deb \
     && dpkg -i chronograf_${CHRONOGRAF_VERSION}_${ARCH}.deb && rm chronograf_${CHRONOGRAF_VERSION}_${ARCH}.deb \
     # Install Grafana
-    && wget https://dl.grafana.com/oss/release/grafana_${GRAFANA_VERSION}_${ARCH}.deb \
+    && wget --no-verbose https://mirrors.tuna.tsinghua.edu.cn/grafana/apt/pool/main/g/grafana/grafana_${GRAFANA_VERSION}_${ARCH}.deb || \
+       wget --no-verbose https://dl.grafana.com/oss/release/grafana_${GRAFANA_VERSION}_${ARCH}.deb \
     && dpkg -i grafana_${GRAFANA_VERSION}_${ARCH}.deb \
     && rm grafana_${GRAFANA_VERSION}_${ARCH}.deb \
     # Cleanup
