@@ -1,10 +1,8 @@
 # Docker Image with InfluxDB and Grafana
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/philhawthorne/docker-influxdb-grafana.svg)](https://dockerhub.com/philhawthorne/docker-influxdb-grafana) [![license](https://img.shields.io/github/license/philhawthorne/docker-influxdb-grafana.svg)](https://dockerhub.com/philhawthorne/docker-influxdb-grafana)
+[![Docker Pulls](https://img.shields.io/docker/pulls/thebluefinance/docker-influxdb-grafana.svg)](https://dockerhub.com/thebluefinance/docker-influxdb-grafana) [![license](https://img.shields.io/github/license/thebluefinance/docker-influxdb-grafana.svg)](https://dockerhub.com/thebluefinance/docker-influxdb-grafana)
 
 ![Grafana][grafana-version] ![Influx][influx-version] ![Chronograf][chronograf-version]
-
-[![Buy me a coffee][buymeacoffee-icon]][buymeacoffee]
 
 
 This is a Docker image based on the awesome [Docker Image with Telegraf (StatsD), InfluxDB and Grafana](https://github.com/samuelebistoletti/docker-statsd-influxdb-grafana) from [Samuele Bistoletti](https://github.com/samuelebistoletti).
@@ -19,9 +17,9 @@ The main purpose of this image is to be used to show data from a [Home Assistant
 
 | Description  | Value   |
 |--------------|---------|
-| InfluxDB     | 1.8.2   |
-| ChronoGraf   | 1.8.6   |
-| Grafana      | 7.2.0   |
+| InfluxDB     | 1.8.10  |
+| ChronoGraf   | 1.8.10  |
+| Grafana      | 12.0.2  |
 
 ## Quick Start
 
@@ -33,9 +31,9 @@ docker run -d \
   -p 3003:3003 \
   -p 3004:8083 \
   -p 8086:8086 \
-  -v /path/for/influxdb:/var/lib/influxdb \
-  -v /path/for/grafana:/var/lib/grafana \
-  philhawthorne/docker-influxdb-grafana:latest
+  -v /tmp/docker/influxdb:/var/lib/influxdb \
+  -v /tmp/docker/grafana:/var/lib/grafana \
+  thebluefinance/docker-influxdb-grafana:latest
 ```
 
 To stop the container launch:
@@ -103,9 +101,6 @@ Port: 8086
 1. Establish a ssh connection with the container
 2. Launch `influx` to open InfluxDB Shell (CLI)
 
-[buymeacoffee-icon]: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
-[buymeacoffee]: https://www.buymeacoffee.com/philhawthorne
-
-[grafana-version]: https://img.shields.io/badge/Grafana-7.2.0-brightgreen
-[influx-version]: https://img.shields.io/badge/Influx-1.8.2-brightgreen
-[chronograf-version]: https://img.shields.io/badge/Chronograf-1.8.6-brightgreen
+[grafana-version]: https://img.shields.io/badge/Grafana-12.0.2-brightgreen
+[influx-version]: https://img.shields.io/badge/Influx-1.8.10-brightgreen
+[chronograf-version]: https://img.shields.io/badge/Chronograf-1.8.10-brightgreen

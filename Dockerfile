@@ -1,13 +1,21 @@
-FROM debian:stretch-slim
-LABEL maintainer="Phil Hawthorne <me@philhawthorne.com>"
+FROM debian:bullseye-slim
+LABEL maintainer="The Blue Finance <thebluefinance@gmail.com>"
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG C.UTF-8
+# Proxy configuration
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ENV HTTP_PROXY=$HTTP_PROXY
+ENV HTTPS_PROXY=$HTTPS_PROXY
+ENV NO_PROXY=$NO_PROXY
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
 
 # Default versions
-ENV INFLUXDB_VERSION=1.8.2
-ENV CHRONOGRAF_VERSION=1.8.6
-ENV GRAFANA_VERSION=7.2.0
+ENV INFLUXDB_VERSION=1.8.10
+ENV CHRONOGRAF_VERSION=1.8.10
+ENV GRAFANA_VERSION=12.0.2
 
 # Grafana database type
 ENV GF_DATABASE_TYPE=sqlite3
@@ -27,6 +35,11 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
       *)     echo "Unsupported architecture: ${dpkgArch}"; exit 1;; \
     esac && \
     rm /var/lib/apt/lists/* -vf \
+    # Configure proxy for apt if needed
+    && if [ ! -z "$HTTP_PROXY" ]; then \
+        echo "Acquire::http::Proxy \"$HTTP_PROXY\";" >> /etc/apt/apt.conf.d/01proxy; \
+        echo "Acquire::https::Proxy \"$HTTPS_PROXY\";" >> /etc/apt/apt.conf.d/01proxy; \
+    fi \
     # Base dependencies
     && apt-get -y update \
     && apt-get -y dist-upgrade \
@@ -42,7 +55,8 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" && \
         supervisor \
         wget \
         gnupg \
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+        musl \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs \
     && mkdir -p /var/log/supervisor \
     && rm -rf .profile \
